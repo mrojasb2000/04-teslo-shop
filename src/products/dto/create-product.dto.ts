@@ -9,6 +9,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { BeforeInsert } from 'typeorm';
 
 export class CreateProductDto {
   @IsString()
@@ -40,4 +41,12 @@ export class CreateProductDto {
   @IsString()
   @IsIn(['men', 'women', 'kid', 'unisex'])
   gender: string;
+
+  @BeforeInsert()
+  createSlugFromTitle() {
+    if (!this.slug) {
+      this.slug = this.title.toLocaleLowerCase();
+    }
+    this.slug = this.slug.trim().replaceAll(' ', '_').replaceAll("'", '');
+  }
 }
