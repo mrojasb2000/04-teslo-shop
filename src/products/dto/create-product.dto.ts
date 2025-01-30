@@ -4,7 +4,6 @@ import {
   IsInt,
   IsNumber,
   IsOptional,
-  IsPort,
   IsPositive,
   IsString,
   MinLength,
