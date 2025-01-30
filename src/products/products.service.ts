@@ -32,19 +32,22 @@ export class ProductsService {
     return `This action returns all products`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  findOne(id: string) {
+    return this.productRepository.findOne({
+      where: { id },
+    });
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
     return `This action updates a #${id} product`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    await this.productRepository.delete({ id });
   }
 
   private handlerDBExceptions(error: any) {
+    console.log(error);
     this.logger.error(`Error: ${error.code}, detail: ${error.detail}`);
     throw new InternalServerErrorException(
       'Unexpected error, check server logs',
