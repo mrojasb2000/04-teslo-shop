@@ -9,10 +9,14 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger('ProductsService');
+  private defaultLimit: number;
+  private defaultOffset: number;
 
   constructor(
     @InjectRepository(Product)
@@ -29,15 +33,39 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return this.productRepository.find();
+  findAll(paginationDto: PaginationDto): Promise<Product[]> {
+    const limit = paginationDto.limit ?? this.defaultLimit;
+    const offset = paginationDto.offset ?? this.defaultOffset;
+
+    return this.productRepository.find({
+      skip: offset,
+      take: limit,
+    });
   }
 
-  async findOne(id: string) {
-    const product = await this.productRepository.findOne({
-      where: { id },
-    });
-    if (!product) throw new NotFoundException(`Product id '${id}' not found!`);
+  async findOne(term: string): Promise<Product> {
+    let product: Product;
+
+    if (isUUID(term)) {
+      product = await this.productRepository.findOne({
+        where: { id: term },
+      });
+    }
+
+    if (!product) {
+      /* product = await this.productRepository.findOne({
+        where: { slug: term },
+      }); */
+      const queryBuilder = this.productRepository.createQueryBuilder();
+      product = await queryBuilder
+        .where('LOWER(title) like :title or LOWER(slug) =:slug', {
+          title: `%${term.toLocaleLowerCase()}%`,
+          slug: term,
+        })
+        .getOne();
+    }
+
+    if (!product) throw new NotFoundException(`Product '${term}' not found!`);
 
     return product;
   }
