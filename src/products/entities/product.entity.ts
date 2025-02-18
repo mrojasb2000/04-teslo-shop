@@ -46,6 +46,13 @@ export class Product {
   @Column('text')
   gender: string;
 
+  @Column('text', {
+    array: true,
+    nullable: true,
+    default: [],
+  })
+  tags: string[];
+
   @BeforeInsert()
   @BeforeUpdate()
   slugifiyInsertTitles() {
