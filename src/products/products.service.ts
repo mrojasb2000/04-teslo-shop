@@ -65,6 +65,9 @@ export class ProductsService {
     if (isUUID(term)) {
       product = await this.productRepository.findOne({
         where: { id: term },
+        relations: {
+          images: true,
+        },
       });
     }
 
