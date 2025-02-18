@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -70,8 +71,23 @@ export class ProductsService {
     return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    // Preload: find product by property (id) and load only properties in UpdateProductDto
+    const product = await this.productRepository.preload({
+      id,
+      ...updateProductDto,
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with id: #${id} not found.`);
+    }
+
+    try {
+      await this.productRepository.save(product);
+      return product;
+    } catch (error) {
+      this.handlerDBExceptions(error);
+    }
   }
 
   async remove(id: string) {
@@ -80,10 +96,12 @@ export class ProductsService {
   }
 
   private handlerDBExceptions(error: any) {
+    if (error.code === '23505') {
+      throw new BadRequestException(`${error.detail}`);
+    }
     console.log(error);
-    this.logger.error(`Error: ${error.code}, detail: ${error.detail}`);
     throw new InternalServerErrorException(
-      'Unexpected error, check server logs',
+      `Can't create Pokemon - Check server logs`,
     );
   }
 }
