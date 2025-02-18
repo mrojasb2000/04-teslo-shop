@@ -60,7 +60,7 @@ export class ProductsService {
       product = await queryBuilder
         .where('LOWER(title) like :title or LOWER(slug) =:slug', {
           title: `%${term.toLocaleLowerCase()}%`,
-          slug: term,
+          slug: term.toLocaleLowerCase(),
         })
         .getOne();
     }
