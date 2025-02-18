@@ -50,6 +50,12 @@ export class ProductsService {
     return this.productRepository.find({
       skip: offset,
       take: limit,
+      relations: {
+        images: true,
+      },
+      order: {
+        created_at: 'DESC', // "ASC" "DESC"
+      },
     });
   }
 
