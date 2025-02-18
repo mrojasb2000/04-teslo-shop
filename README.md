@@ -5,22 +5,36 @@
 # Ejecutar en desarrollo
 
 1. Clonar el repositorio
-2. Ejecutar
 
 ```sh
-yarn install
+git clone https://github.com/<username>/<projectname>
 ```
 
-3. Tener Nest CLI instalado
+1. Tener Nest CLI instalado
 
 ```sh
 npm i -g @nestjs/cli
 ```
 
-4. Levantar la base de datos
+1. Instalar dependencias
+
+```sh
+yarn install
+```
+
+1. Clonar el archivo '.env.template' y renombrarlo a '.env'
+1. Cambiar los valores de la variables de entorno
+
+1. Levantar la base de datos
 
 ```sh
 docker-compose up -d
+```
+
+1. Ejecutar el proyecto en modo desarrollo
+
+```sh
+yarn start:dev
 ```
 
 ## Stack usado
