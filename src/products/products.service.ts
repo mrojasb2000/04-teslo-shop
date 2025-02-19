@@ -70,9 +70,9 @@ export class ProductsService {
     if (isUUID(term)) {
       product = await this.productRepository.findOne({
         where: { id: term },
-        relations: {
-          images: true,
-        },
+        // relations: {
+        //   images: true,
+        // },
       });
     }
 
@@ -80,12 +80,13 @@ export class ProductsService {
       /* product = await this.productRepository.findOne({
         where: { slug: term },
       }); */
-      const queryBuilder = this.productRepository.createQueryBuilder();
+      const queryBuilder = this.productRepository.createQueryBuilder('prod');
       product = await queryBuilder
         .where('LOWER(title) like :title or LOWER(slug) =:slug', {
           title: `%${term.toLocaleLowerCase()}%`,
           slug: term.toLocaleLowerCase(),
         })
+        .leftJoinAndSelect('prod.images', 'prodImages')
         .getOne();
     }
 
