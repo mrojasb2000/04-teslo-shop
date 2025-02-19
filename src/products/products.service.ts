@@ -92,7 +92,15 @@ export class ProductsService {
 
     if (!product) throw new NotFoundException(`Product '${term}' not found!`);
 
-    return { ...product, images: product.images.map((img) => img.url) };
+    return product;
+  }
+
+  async findOnePlain(term: string) {
+    const { images = [], ...product } = await this.findOne(term);
+    return {
+      ...product,
+      images: images.map((img) => img.url),
+    };
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
