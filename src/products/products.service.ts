@@ -43,11 +43,11 @@ export class ProductsService {
     }
   }
 
-  findAll(paginationDto: PaginationDto): Promise<Product[]> {
+  async findAll(paginationDto: PaginationDto) {
     const limit = paginationDto.limit ?? this.defaultLimit;
     const offset = paginationDto.offset ?? this.defaultOffset;
 
-    return this.productRepository.find({
+    const products = await this.productRepository.find({
       skip: offset,
       take: limit,
       relations: {
@@ -57,9 +57,14 @@ export class ProductsService {
         created_at: 'DESC', // "ASC" "DESC"
       },
     });
+
+    return products.map((product) => ({
+      ...product,
+      images: product.images.map((img) => img.url),
+    }));
   }
 
-  async findOne(term: string): Promise<Product> {
+  async findOne(term: string) {
     let product: Product;
 
     if (isUUID(term)) {
@@ -86,7 +91,7 @@ export class ProductsService {
 
     if (!product) throw new NotFoundException(`Product '${term}' not found!`);
 
-    return product;
+    return { ...product, images: product.images.map((img) => img.url) };
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
