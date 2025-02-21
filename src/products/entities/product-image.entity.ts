@@ -9,6 +9,9 @@ export class ProductImage {
   @Column('text')
   url: string;
 
-  @ManyToOne(() => Product, (product) => product.images, { nullable: false })
+  @ManyToOne(() => Product, (product) => product.images, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   product: Product;
 }
