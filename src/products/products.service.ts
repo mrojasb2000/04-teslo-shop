@@ -145,11 +145,11 @@ export class ProductsService {
 
   private handlerDBExceptions(error: any) {
     if (error.code === '23505') {
-      throw new BadRequestException(`${error.detail}`);
+      throw new BadRequestException(error.detail);
     }
     console.log(error);
     throw new InternalServerErrorException(
-      `Can't create Pokemon - Check server logs`,
+      `Unexpected error - check server logs`,
     );
   }
 }
